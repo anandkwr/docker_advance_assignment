@@ -3,15 +3,21 @@ services:
   mysql:
     image: mysql:8
     environment:
-      MYSQL_ROOT_PASSWORD: Anand@1234
+      #MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD} # Use env variable for MySQL root password
+      #MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_password # Use secret for MySQL root password
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_password
       MYSQL_DATABASE: studentdb
     ports:
       - "3306:3306"
     volumes:
       - mysql-data:/var/lib/mysql
+      - ./mysql_root_password.txt:/run/secrets/mysql_root_password
+    networks:
+      - docker_custom_network1
 
   app:
     build: .
+    container_name: studentcrud_app
     ports:
       - "8080:8080"
     depends_on:
@@ -19,9 +25,21 @@ services:
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/studentdb
       SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: Anand@1234
+      #SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      #SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQLDialect
-
+      SPRING_DATASOURCE_PASSWORD_FILE: /run/secrets/mysql_user_password
+    networks:
+      - docker_custom_network1
+    volumes:
+      - ./src:/home/app/src # Bind mount for accessing code
+      - ./mysql_user_password.txt:/run/secrets/mysql_user_password  # Bind mount for secrets
+# Defining  volume
 volumes:
   mysql-data:
+  
+# Defining a custom network
+networks:
+  docker_custom_network1:
+    driver: bridge  

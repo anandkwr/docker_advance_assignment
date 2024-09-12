@@ -1,0 +1,15 @@
+version: '3.3'
+
+services:
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    networks:
+      - monitoring
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin  # Set a strong password in production
+
+networks:
+  monitoring:
+    driver: bridge
