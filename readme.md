@@ -132,4 +132,4 @@ To run the project:
     docker-compose up -d
     ```
 
-Feel free to explore the repository for more details on how each step is implemented.
+
